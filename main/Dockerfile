@@ -1,4 +1,4 @@
-FROM arm32v7/openjdk:8-jdk-alpine
+FROM arm32v7/openjdk:8-jdk-slim
 
 RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils tini
 
