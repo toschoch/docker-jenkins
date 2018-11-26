@@ -19,7 +19,7 @@ Installation / Usage
 clone the repo:
 
 ```bash
-git clone <git-url>
+git clone https://github.com/toschoch/docker-jenkins.git
 ```
 
 create the docker secrets
