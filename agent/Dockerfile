@@ -1,4 +1,4 @@
-FROM docker
+FROM arm64v8/docker
 
 MAINTAINER Viktor Farcic <viktor@farcic.com>
 
