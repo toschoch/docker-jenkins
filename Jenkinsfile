@@ -4,16 +4,12 @@ node('docker') {
     }
 
     stage('Build Master') {
-        sh 'cd main/'
-        def customImage = docker.build("shocki/jenkins-master")
+        def customImage = docker.build("shocki/jenkins-master", "./main/Dockerfile")
         customImage.push()
-        sh 'cd ..'
     }
 
     stage('Build Agent') {
-        sh 'cd agent/'
-        def customImage = docker.build("shocki/jenkins-master")
+        def customImage = docker.build("shocki/jenkins-agent", "./agent/Dockerfile")
         customImage.push()
-        sh 'cd ..'
     }
 }
