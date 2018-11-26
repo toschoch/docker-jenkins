@@ -1,4 +1,4 @@
-FROM arm32v7/openjdk:8-jdk-slim
+FROM resin/raspberry-pi-alpine-openjdk:openjdk-8-jdk
 
 RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils tini
 
