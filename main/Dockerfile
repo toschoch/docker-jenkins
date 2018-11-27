@@ -1,4 +1,7 @@
-FROM resin/raspberry-pi2-alpine-openjdk:openjdk-8-jdk
+
+ARG IMAGE
+
+FROM $IMAGE
 
 RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils tini
 
@@ -72,7 +75,7 @@ COPY plugins.sh /usr/local/bin/plugins.sh
 COPY install-plugins.sh /usr/local/bin/install-plugins.sh
  
 # Installing the plugins we need using the in-built install-plugins.sh script
-RUN /usr/local/bin/install-plugins.sh git gogs-webhook matrix-auth workflow-aggregator docker-workflow blueocean credentials-binding 
+RUN /usr/local/bin/install-plugins.sh git gogs-webhook matrix-auth workflow-aggregator docker-workflow blueocean credentials-binding
  
 # Setting up environment variables for Jenkins admin user
 ENV JENKINS_USER jenkins-user

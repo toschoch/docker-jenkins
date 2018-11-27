@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.1'
 services:
     master:
         ports:
@@ -29,6 +29,7 @@ services:
             placement: 
                 constraints:
                     - node.labels.device.group==build-pi
+
 
 secrets:
   jenkins-user:
