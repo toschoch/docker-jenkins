@@ -1,4 +1,4 @@
-FROM arm32v6/docker
+FROM resin/raspberry-pi2-alpine
 
 MAINTAINER Viktor Farcic <viktor@farcic.com>
 
