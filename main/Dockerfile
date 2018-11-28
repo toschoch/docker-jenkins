@@ -1,7 +1,11 @@
 
 ARG IMAGE
+ARG QEMU=qemu-arm-static
 
 FROM $IMAGE
+
+COPY $QEMU /usr/bin
+RUN if [ "x$arg" = "x" ] ; rm /usr/bin/$QEMU ; fi
 
 RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils tini
 
@@ -71,7 +75,6 @@ COPY tini-shim.sh /bin/tini
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/jenkins.sh"]
 
 # from a derived Dockerfile, can use `RUN plugins.sh active.txt` to setup /usr/share/jenkins/ref/plugins from a support bundle
-COPY plugins.sh /usr/local/bin/plugins.sh
 COPY install-plugins.sh /usr/local/bin/install-plugins.sh
  
 # Installing the plugins we need using the in-built install-plugins.sh script
