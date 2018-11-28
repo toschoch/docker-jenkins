@@ -1,12 +1,10 @@
 
-ARG IMAGE
-ARG XBUILD
+ARG IMAGE=openjdk:8-alpine
 ARG QEMU=qemu-arm-static
 
 FROM $IMAGE
 
 COPY $QEMU /usr/bin
-# RUN if [ "x$XBUILD" = "x" ] ; then rm "/usr/bin/$QEMU" ; fi
 
 RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils tini
 
@@ -42,10 +40,10 @@ COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groov
 
 # jenkins version being bundled in this docker image
 ARG JENKINS_VERSION
-ENV JENKINS_VERSION ${JENKINS_VERSION:-2.60.3}
+ENV JENKINS_VERSION ${JENKINS_VERSION:-2.153}
 
 # jenkins.war checksum, download will be validated using it
-ARG JENKINS_SHA=2d71b8f87c8417f9303a73d52901a59678ee6c0eefcf7325efed6035ff39372a
+ARG JENKINS_SHA=6c9db386bea9a9ecfd5483a0b4f41053b4d77c45669087bba657e48adc1f7302
 
 # Can be used to customize where jenkins.war get downloaded from
 ARG JENKINS_URL=https://repo.jenkins-ci.org/public/org/jenkins-ci/main/jenkins-war/${JENKINS_VERSION}/jenkins-war-${JENKINS_VERSION}.war
@@ -54,6 +52,7 @@ ARG JENKINS_URL=https://repo.jenkins-ci.org/public/org/jenkins-ci/main/jenkins-w
 # see https://github.com/docker/docker/issues/8331
 RUN curl -fsSL ${JENKINS_URL} -o /usr/share/jenkins/jenkins.war \
   && echo "${JENKINS_SHA}  /usr/share/jenkins/jenkins.war" | sha256sum -c -
+
 
 ENV JENKINS_UC https://updates.jenkins.io
 ENV JENKINS_UC_EXPERIMENTAL=https://updates.jenkins.io/experimental
