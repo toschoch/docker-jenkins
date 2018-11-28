@@ -1,6 +1,4 @@
-FROM resin/raspberry-pi2-alpine
-
-MAINTAINER Viktor Farcic <viktor@farcic.com>
+FROM alpine
 
 ENV SWARM_CLIENT_VERSION="3.9" \
     DOCKER_COMPOSE_VERSION="1.23.1" \
