@@ -1,10 +1,4 @@
-
-ARG IMAGE=openjdk:8-alpine
-ARG QEMU=qemu-arm-static
-
-FROM $IMAGE
-
-COPY $QEMU /usr/bin
+FROM openjdk:8-jdk-alpine
 
 RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils tini
 
