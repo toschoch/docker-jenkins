@@ -1,4 +1,4 @@
-#! /bin/bash -e
+#! /bin/ash -e
 
 echo "looking for secrets..."
 if [ -f "/run/secrets/${JENKINS_USER}" ]; then

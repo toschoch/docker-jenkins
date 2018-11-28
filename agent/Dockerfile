@@ -1,4 +1,4 @@
-FROM alpine
+FROM openjdk:8-jre-alpine
 
 ENV SWARM_CLIENT_VERSION="3.9" \
     DOCKER_COMPOSE_VERSION="1.23.1" \
@@ -7,9 +7,9 @@ ENV SWARM_CLIENT_VERSION="3.9" \
     PASSWORD_SECRET=""
 
 RUN adduser -G root -D jenkins && \
-    apk --update --no-cache add openjdk8-jre python py-pip git openssh ca-certificates openssl bash && \
+    apk --update --no-cache add python py-pip git openssh ca-certificates openssl bash && \
     wget -q https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/swarm-client-${SWARM_CLIENT_VERSION}.jar -P /home/jenkins/ && \
-    pip install docker-compose jenkins-webapi
+    pip install docker-compose jenkins-webapi 
 
 # Start-up script to attach the slave to the master
 ADD slave.py /var/lib/jenkins/slave.py
@@ -26,6 +26,7 @@ ENV SLAVE_EXECUTORS "1"
 ENV SLAVE_LABELS "docker"
 ENV SLAVE_WORING_DIR ""
 ENV CLEAN_WORKING_DIR "true"
+
 
 COPY run.sh /var/lib/jenkins
 
