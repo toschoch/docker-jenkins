@@ -25,9 +25,9 @@ ENV SLAVE_EXECUTORS "1"
 ENV SLAVE_LABELS "docker"
 ENV SLAVE_WORKING_DIR ""
 ENV CLEAN_WORKING_DIR "true"
-ENV JAVA "java"
+ENV JAVA "/usr/bin/java"
 
-
+USER root
 COPY run.sh /var/lib/jenkins
 
 ENTRYPOINT ["/var/lib/jenkins/run.sh"]

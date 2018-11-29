@@ -16,7 +16,6 @@ services:
     agent:
         environment:
             - 'JENKINS_URL=http://master:8080'
-            - 'JAVA=/usr'
 
         image: shocki/jenkins-agent
         hostname: '{{.Node.Hostname}}'
