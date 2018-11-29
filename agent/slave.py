@@ -69,8 +69,8 @@ while not master_ready(slave_jar_url):
 slave_download(slave_jar)
 print 'Downloaded Jenkins slave jar.'
 
-if os.environ['SLAVE_WORING_DIR']:
-    os.setcwd(os.environ['SLAVE_WORING_DIR'])
+if os.environ['SLAVE_WORKING_DIR']:
+    os.setcwd(os.environ['SLAVE_WORKING_DIR'])
 
 if os.environ['CLEAN_WORKING_DIR'] == 'true':
     clean_dir(os.getcwd())
