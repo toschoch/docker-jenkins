@@ -5,9 +5,10 @@ import hudson.security.*
 import jenkins.security.s2m.AdminWhitelistRule
 
 def instance = Jenkins.getInstance()
+def env = System.getenv()
 
-def userFile = new File(System.getenv()["SECRETS_DIR"] + "/" + System.getenv()["JENKINS_USER"])
-def userPass = new File(System.getenv()["SECRETS_DIR"] + "/" + System.getenv()["JENKINS_PASS"])
+def userFile = new File(env.SECRETS_DIR + "/" + env.JENKINS_USER)
+def userPass = new File(env.SECRETS_DIR + "/" + env.JENKINS_PASS)
 
 if (userFile.exists())
 {
@@ -15,16 +16,16 @@ if (userFile.exists())
 }
 else
 {
-    def user = System.getenv()["JENKINS_USER"]
+    def user = env.JENKINS_USER
 }
 
 if (userPass.exists())
 {
-    def user = userPass.text.trim()
+    def pass = userPass.text.trim()
 }
 else
 {
-    def user = System.getenv()["JENKINS_PASS"]
+    def pass = env.JENKINS_PASS
 }
 
 
