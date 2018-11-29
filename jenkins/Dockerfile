@@ -1,0 +1,25 @@
+FROM jenkins/jenkins:lts-alpine
+ 
+# install docker for executors
+USER root
+RUN apk add --no-cache docker
+USER jenkins
+
+# Installing the plugins we need using the in-built install-plugins.sh script
+RUN /usr/local/bin/install-plugins.sh git gogs-webhook matrix-auth workflow-aggregator docker-workflow blueocean credentials-binding
+ 
+# Setting up environment variables for Jenkins admin user
+ENV JENKINS_USER jenkins-user
+ENV JENKINS_PASS jenkins-pass
+ 
+# Skip the initial setup wizard
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
+ 
+# Start-up scripts to set number of executors and creating the admin user
+COPY jenkins.sh /usr/local/bin/jenkins.sh
+COPY executors.groovy /usr/share/jenkins/ref/init.groovy.d/
+COPY default-user.groovy /usr/share/jenkins/ref/init.groovy.d/
+ 
+VOLUME /var/jenkins_home
+
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/jenkins.sh"]

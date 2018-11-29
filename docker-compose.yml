@@ -3,23 +3,29 @@ services:
     master:
         ports:
             - '8080:8080'
-        image: shocki/jenkins-master
+            - '50000:50000'
+
+        image: shocki/jenkins
         secrets:
             - jenkins-user
             - jenkins-pass
+
         deploy:
             replicas: 1
-            placement: 
-                constraints:
-                    - node.labels.device.group==build-pi
 
     agent:
+
         environment:
             - 'JENKINS_URL=http://master:8080'
         image: shocki/jenkins-agent
+        hostname: '{{.Node.Hostname}}'
+
+        ports:
+            - '50000:50000'
+
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock  # Expose the docker daemon in the container
-            - /home/jenkins:/home/jenkins # Avoid mysql volume mount issue
+            # - /home/jenkins:/home/jenkins # Avoid mysql volume mount issue
         secrets:
             - jenkins-user
             - jenkins-pass

@@ -38,7 +38,7 @@ def slave_download(target):
     loader.retrieve(os.environ['JENKINS_URL'] + '/jnlpJars/slave.jar', '/var/lib/jenkins/slave.jar')
 
 def slave_run(slave_jar, jnlp_url):
-    params = [ 'java', '-jar', slave_jar, '-jnlpUrl', jnlp_url ]
+    params = [ os.environ.get('JAVA','java'), '-jar', slave_jar, '-jnlpUrl', jnlp_url ]
     if os.environ['JENKINS_SLAVE_ADDRESS'] != '':
         params.extend([ '-connectTo', os.environ['JENKINS_SLAVE_ADDRESS' ] ])
 
