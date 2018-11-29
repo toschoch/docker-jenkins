@@ -14,17 +14,16 @@ services:
             replicas: 1
 
     agent:
-
         environment:
             - 'JENKINS_URL=http://master:8080'
+            - 'JAVA=/usr'
+
         image: shocki/jenkins-agent
         hostname: '{{.Node.Hostname}}'
 
-        ports:
-            - '50000:50000'
-
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock  # Expose the docker daemon in the container
+            - /usr/bin/java:/usr/bin/java  # use the host jre for beeing more efficient
             # - /home/jenkins:/home/jenkins # Avoid mysql volume mount issue
         secrets:
             - jenkins-user
