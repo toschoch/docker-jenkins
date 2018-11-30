@@ -1,6 +1,7 @@
 credentials-binding
 matrix-auth
 git
+swarm
 workflow-aggregator
 pipeline-utility-steps
 docker-workflow
