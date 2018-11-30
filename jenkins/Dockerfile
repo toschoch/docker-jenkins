@@ -11,11 +11,17 @@ ENV JENKINS_PASS jenkins-pass
 
 # install docker for executors
 USER root
-RUN apk add --no-cache docker
+RUN apk add --no-cache docker git
+
+# Copy the modified install-plugins.sh that does not install all standard plugins
+#COPY install-plugins.sh /usr/local/bin/install-plugins.sh
+#RUN chmod 755 /usr/local/bin/install-plugins.sh
+
 USER jenkins
 
 # Creates username and password specified through environment variables JENKINS_USER_SECRET and JENKINS_PASS_SECRET
-COPY security.groovy /usr/share/jenkins/ref/init.groovy.d/security.groovy
+COPY default-user.groovy /usr/share/jenkins/ref/init.groovy.d/default-user.groovy
+
 
 # Install a list of plugins from the file 'plugins.txt' and their dependencies
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt

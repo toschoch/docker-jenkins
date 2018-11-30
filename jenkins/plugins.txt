@@ -1,13 +1,8 @@
-credentials
 credentials-binding
-script-security
-workflow-aggregator
-docker-workflow
 matrix-auth
-git-client
-pipeline-utility-steps
 git
-github
-swarm
-blueocean
+workflow-aggregator
+pipeline-utility-steps
+docker-workflow
 gogs-webhook
+
