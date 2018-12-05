@@ -4,7 +4,7 @@ node('docker') {
     }
 
     stage('Build Master') {
-        def customImage = docker.build("shocki/jenkins-master", "./main")
+        def customImage = docker.build("shocki/jenkins-master", "./jenkins")
         customImage.push()
     }
 
