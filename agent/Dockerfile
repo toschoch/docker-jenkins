@@ -1,36 +1,18 @@
-FROM python:2-alpine
+FROM openjdk:8-jre-alpine
 
-ENV SWARM_CLIENT_VERSION="3.9" \
+ENV SWARM_CLIENT_VERSION="3.14" \
     DOCKER_COMPOSE_VERSION="1.23.1" \
-    COMMAND_OPTIONS="" \
-    USER_NAME_SECRET="" \
-    PASSWORD_SECRET=""
+    COMMAND_OPTIONS="" 
 
 RUN adduser -G root -D jenkins -h /home/jenkins && \
-    apk --update --no-cache add docker git openssh ca-certificates openssl && \
+    apk --update --no-cache add git docker python py-pip && \
     wget -q https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/swarm-client-${SWARM_CLIENT_VERSION}.jar -P /home/jenkins/ && \
-    pip install docker-compose jenkins-webapi
+    pip install docker-compose
 
-# Start-up script to attach the slave to the master
-ADD slave.py /var/lib/jenkins/slave.py
-WORKDIR /home/jenkins
- 
-ENV JENKINS_URL "http://jenkins"
-ENV JENKINS_SLAVE_ADDRESS ""
-ENV JENKINS_USER "jenkins-user"
-ENV JENKINS_PASS "jenkins-pass"
-ENV SLAVE_NAME ""
-ENV SLAVE_SECRET ""
-ENV SLAVE_EXECUTORS "1"
-ENV SLAVE_LABELS "docker"
-ENV SLAVE_WORKING_DIR ""
-ENV CLEAN_WORKING_DIR "true"
-ENV JAVA "/usr/bin/java"
+ENV JENKINS_USER="jenkins-user" JENKINS_PASS="jenkins-pass"
 
-USER root
-COPY run.sh /var/lib/jenkins
+COPY run.sh /run.sh
+RUN mkdir /workspace && chmod 777 /workspace && chmod +x /run.sh
 
-ENTRYPOINT ["/var/lib/jenkins/run.sh"]
-
-CMD [ "python", "-u", "/var/lib/jenkins/slave.py" ]
+CMD ["/run.sh"]
 

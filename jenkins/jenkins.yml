@@ -1,11 +1,23 @@
-version: '3'
+version: '3.1'
 
 services:
 
-  main:
-    image: jenkinsci/jenkins:${TAG:-lts-alpine}
+  master:
+    image: shocki/jenkins
+    environment:
+      - JENKINS_URL=http://localhost:8080
     ports:
       - ${UI_PORT:-8080}:8080
       - ${AGENTS_PORT:-50000}:50000
-    environment:
-      - JENKINS_OPTS="--prefix=/jenkins"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Expose the docker daemon in the container
+    secrets:
+      - jenkins-user
+      - jenkins-pass
+
+
+secrets:
+  jenkins-user:
+    external: true
+  jenkins-pass:
+    external: true
