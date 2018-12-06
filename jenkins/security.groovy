@@ -12,11 +12,11 @@ def userPass = new File(env.SECRETS_DIR + "/" + env.JENKINS_PASS)
 
 if (userFile.exists())
 {
-    def user = userFile.text.trim()
+    def userName = userFile.text.trim()
 }
 else
 {
-    def user = env.JENKINS_USER
+    def userName = env.JENKINS_USER
 }
 
 if (userPass.exists())
@@ -31,14 +31,13 @@ else
 
 println "Creating user " + user + "..."
 
-def hudsonRealm = new HudsonPrivateSecurityRealm(false)
-hudsonRealm.createAccount(user, pass)
-instance.setSecurityRealm(hudsonRealm)
+instance.setSecurityRealm(new HudsonPrivateSecurityRealm(false))
+instance.setAuthorizationStrategy(new GlobalMatrixAuthorizationStrategy())
 
-def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
-instance.setAuthorizationStrategy(strategy)
+def user = jenkins.getSecurityRealm().createAccount(userName, pass)
+user.save()
+
+instance.getAuthorizationStrategy().add(Jenkins.ADMINISTER, userName)
 instance.save()
-
-Jenkins.instance.getInjector().getInstance(AdminWhitelistRule.class).setMasterKillSwitch(false)
 
 println "User " + user + " was created"
