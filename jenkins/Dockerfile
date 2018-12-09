@@ -4,9 +4,9 @@ ENV LANG=C.UTF-8
 
 # Here we install GNU libc (aka glibc) and set C.UTF-8 locale as default.
 
-ENV ALPINE_GLIBC_BASE_URL="https://github.com/armhf-docker-library/alpine-pkg-glibc/releases/download"
-ENV ALPINE_GLIBC_PACKAGE_VERSION="2.22"
-ENV ALPINE_GLIBC_PACKAGE_VERSION_FILE="2.22-r8"
+ENV ALPINE_GLIBC_BASE_URL="https://github.com/yangxuan8282/alpine-pkg-glibc/releases/download"
+ENV ALPINE_GLIBC_PACKAGE_VERSION="2.27-r0"
+ENV ALPINE_GLIBC_PACKAGE_VERSION_FILE="${ALPINE_GLIBC_PACKAGE_VERSION}"
 ENV ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION_FILE.apk"
 ENV ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION_FILE.apk"
 ENV ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION_FILE.apk"
@@ -83,11 +83,11 @@ VOLUME /var/jenkins_home
 # or config file with your custom jenkins Docker image.
 RUN mkdir -p /usr/share/jenkins/ref/init.groovy.d
 
-ENV TINI_VERSION 0.14.0
-ENV TINI_SHA 6c41ec7d33e857d4779f14d9c74924cab0c7973485d2972419a3b7c7620ff5fd
+ENV TINI_VERSION 0.18.0
+ENV TINI_SHA efc2933bac3290aae1180a708f58035baf9f779833c2ea98fcce0ecdab68aa61
 
 # Use tini as subreaper in Docker container to adopt zombie processes 
-RUN curl -fsSL https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static-amd64 -o /bin/tini && chmod +x /bin/tini \
+RUN curl -fsSL https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static-armhf -o /bin/tini && chmod +x /bin/tini \
 && echo "$TINI_SHA  /bin/tini" | sha256sum -c -
 
 COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groovy
@@ -122,7 +122,7 @@ USER ${user}
 
 COPY jenkins-support /usr/local/bin/jenkins-support
 COPY jenkins.sh /usr/local/bin/jenkins.sh
-# ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
+ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
 
 # from a derived Dockerfile, can use `RUN plugins.sh active.txt` to setup /usr/share/jenkins/ref/plugins from a support bundle
 COPY plugins.sh /usr/local/bin/plugins.sh
