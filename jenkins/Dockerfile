@@ -4,7 +4,7 @@ ENV LANG=C.UTF-8
 
 # Here we install GNU libc (aka glibc) and set C.UTF-8 locale as default.
 
-ENV ALPINE_GLIBC_BASE_URL="https://github.com/armhf-docker-library/alpine-pkg-glibc/releases"
+ENV ALPINE_GLIBC_BASE_URL="https://github.com/armhf-docker-library/alpine-pkg-glibc/releases/download"
 ENV ALPINE_GLIBC_PACKAGE_VERSION="2.22"
 ENV ALPINE_GLIBC_PACKAGE_VERSION_FILE="2.22-r8"
 ENV ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION_FILE.apk"
