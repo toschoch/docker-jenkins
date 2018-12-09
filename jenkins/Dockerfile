@@ -1,33 +1,19 @@
-FROM alpine:3.8
+FROM alpine:3.2
 
-ENV LANG=C.UTF-8
+# Here we use several hacks collected from https://github.com/gliderlabs/docker-alpine/issues/11:
+# 1. install GLibc (which is not the cleanest solution at all)
+# 2. hotfix /etc/nsswitch.conf, which is apperently required by glibc and is not used in Alpine Linux
 
-# Here we install GNU libc (aka glibc) and set C.UTF-8 locale as default.
-
-ENV ALPINE_GLIBC_BASE_URL="https://github.com/yangxuan8282/alpine-pkg-glibc/releases/download"
-ENV ALPINE_GLIBC_PACKAGE_VERSION="2.27-r0"
-ENV ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
-ENV ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
-ENV ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
-RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates
-
-RUN wget "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
-         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME"  \
-         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
-RUN apk add --allow-untrusted --no-cache \
-        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
-
-RUN /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 "$LANG" || true
-RUN echo "export LANG=$LANG" > /etc/profile.d/locale.sh
-RUN apk del glibc-i18n
-RUN rm "/root/.wget-hsts"
-RUN apk del .build-dependencies
-RUN rm \
-        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
+RUN apk add --update wget ca-certificates && \
+    export ALPINE_GLIBC_BASE_URL="https://circle-artifacts.com/gh/andyshinn/alpine-pkg-glibc/6/artifacts/0/home/ubuntu/alpine-pkg-glibc/packages/x86_64" && \
+    export ALPINE_GLIBC_PACKAGE="glibc-2.21-r2.apk" && \
+    export ALPINE_GLIBC_BIN_PACKAGE="glibc-bin-2.21-r2.apk" && \
+    wget "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE" "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_BIN_PACKAGE" && \
+    apk add --allow-untrusted "$ALPINE_GLIBC_PACKAGE" "$ALPINE_GLIBC_BIN_PACKAGE" && \
+    /usr/glibc/usr/bin/ldconfig "/lib" "/usr/glibc/usr/lib" && \
+    echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf && \
+    apk del wget ca-certificates && \
+rm "$ALPINE_GLIBC_PACKAGE" "$ALPINE_GLIBC_BIN_PACKAGE" /var/cache/apk/*d
 
 ENV JAVA_VERSION=8 \
     JAVA_UPDATE=192 \ 
@@ -121,35 +107,35 @@ USER ${user}
 
 COPY jenkins-support /usr/local/bin/jenkins-support
 COPY jenkins.sh /usr/local/bin/jenkins.sh
-ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
+# ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
 
 # from a derived Dockerfile, can use `RUN plugins.sh active.txt` to setup /usr/share/jenkins/ref/plugins from a support bundle
 COPY plugins.sh /usr/local/bin/plugins.sh
 COPY install-plugins.sh /usr/local/bin/install-plugins.sh
 
-ENV SECRETS_DIR=/run/secrets
-# Whether to skip setup wizard
-ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
+# ENV SECRETS_DIR=/run/secrets
+# # Whether to skip setup wizard
+# ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 
-# Setting up environment variables for Jenkins admin user
-ENV JENKINS_USER jenkins-user
-ENV JENKINS_PASS jenkins-pass
+# # Setting up environment variables for Jenkins admin user
+# ENV JENKINS_USER jenkins-user
+# ENV JENKINS_PASS jenkins-pass
 
-# install docker for executors
-USER root
-RUN apk add --no-cache docker git
+# # install docker for executors
+# USER root
+# RUN apk add --no-cache docker git
 
-# Copy the modified install-plugins.sh that does not install all standard plugins
-#COPY install-plugins.sh /usr/local/bin/install-plugins.sh
-#RUN chmod 755 /usr/local/bin/install-plugins.sh
+# # Copy the modified install-plugins.sh that does not install all standard plugins
+# #COPY install-plugins.sh /usr/local/bin/install-plugins.sh
+# #RUN chmod 755 /usr/local/bin/install-plugins.sh
 
-USER jenkins
+# USER jenkins
 
-# Creates username and password specified through environment variables JENKINS_USER_SECRET and JENKINS_PASS_SECRET
-COPY default-user.groovy /usr/share/jenkins/ref/init.groovy.d/default-user.groovy
+# # Creates username and password specified through environment variables JENKINS_USER_SECRET and JENKINS_PASS_SECRET
+# COPY default-user.groovy /usr/share/jenkins/ref/init.groovy.d/default-user.groovy
 
 
-# Install a list of plugins from the file 'plugins.txt' and their dependencies
-COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
-RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
+# # Install a list of plugins from the file 'plugins.txt' and their dependencies
+# COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+# RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
