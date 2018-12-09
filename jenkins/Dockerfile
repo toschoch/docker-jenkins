@@ -4,11 +4,11 @@ ENV LANG=C.UTF-8
 
 # Here we install GNU libc (aka glibc) and set C.UTF-8 locale as default.
 
-RUN ALPINE_GLIBC_BASE_URL="https://github.com/yangxuan8282/alpine-pkg-glibc/releases/download"
-RUN ALPINE_GLIBC_PACKAGE_VERSION="2.27-r0"
-RUN ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
-RUN ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
-RUN ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
+ENV ALPINE_GLIBC_BASE_URL="https://github.com/yangxuan8282/alpine-pkg-glibc/releases/download"
+ENV ALPINE_GLIBC_PACKAGE_VERSION="2.27-r0"
+ENV ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
+ENV ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
+ENV ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
 RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates
 RUN echo \
         "-----BEGIN PUBLIC KEY-----\
