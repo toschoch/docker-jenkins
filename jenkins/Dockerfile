@@ -128,29 +128,29 @@ ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
 COPY plugins.sh /usr/local/bin/plugins.sh
 COPY install-plugins.sh /usr/local/bin/install-plugins.sh
 
-# ENV SECRETS_DIR=/run/secrets
-# # Whether to skip setup wizard
-# ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
+ENV SECRETS_DIR=/run/secrets
+# Whether to skip setup wizard
+ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 
-# # Setting up environment variables for Jenkins admin user
-# ENV JENKINS_USER jenkins-user
-# ENV JENKINS_PASS jenkins-pass
+# Setting up environment variables for Jenkins admin user
+ENV JENKINS_USER jenkins-user
+ENV JENKINS_PASS jenkins-pass
 
-# # install docker for executors
-# USER root
-# RUN apk add --no-cache docker git
+# install docker for executors
+USER root
+RUN apk add --no-cache docker git
 
-# # Copy the modified install-plugins.sh that does not install all standard plugins
-# #COPY install-plugins.sh /usr/local/bin/install-plugins.sh
-# #RUN chmod 755 /usr/local/bin/install-plugins.sh
+# Copy the modified install-plugins.sh that does not install all standard plugins
+#COPY install-plugins.sh /usr/local/bin/install-plugins.sh
+#RUN chmod 755 /usr/local/bin/install-plugins.sh
 
-# USER jenkins
+USER jenkins
 
-# # Creates username and password specified through environment variables JENKINS_USER_SECRET and JENKINS_PASS_SECRET
-# COPY default-user.groovy /usr/share/jenkins/ref/init.groovy.d/default-user.groovy
+# Creates username and password specified through environment variables JENKINS_USER_SECRET and JENKINS_PASS_SECRET
+COPY default-user.groovy /usr/share/jenkins/ref/init.groovy.d/default-user.groovy
 
 
-# # Install a list of plugins from the file 'plugins.txt' and their dependencies
-# COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
-# RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
+# Install a list of plugins from the file 'plugins.txt' and their dependencies
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
