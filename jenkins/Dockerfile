@@ -1,19 +1,33 @@
-FROM alpine
+FROM alpine:3.8
 
-# Here we use several hacks collected from https://github.com/gliderlabs/docker-alpine/issues/11:
-# 1. install GLibc (which is not the cleanest solution at all)
-# 2. hotfix /etc/nsswitch.conf, which is apperently required by glibc and is not used in Alpine Linux
+ENV LANG=C.UTF-8
 
-RUN apk add --update wget ca-certificates && \
-    export ALPINE_GLIBC_BASE_URL="https://circle-artifacts.com/gh/andyshinn/alpine-pkg-glibc/6/artifacts/0/home/ubuntu/alpine-pkg-glibc/packages/x86_64" && \
-    export ALPINE_GLIBC_PACKAGE="glibc-2.21-r2.apk" && \
-    export ALPINE_GLIBC_BIN_PACKAGE="glibc-bin-2.21-r2.apk" && \
-    wget "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE" "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_BIN_PACKAGE" && \
-    apk add --allow-untrusted "$ALPINE_GLIBC_PACKAGE" "$ALPINE_GLIBC_BIN_PACKAGE" && \
-    /usr/glibc/usr/bin/ldconfig "/lib" "/usr/glibc/usr/lib" && \
-    echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf && \
-    apk del wget ca-certificates && \
-rm "$ALPINE_GLIBC_PACKAGE" "$ALPINE_GLIBC_BIN_PACKAGE" /var/cache/apk/*d
+# Here we install GNU libc (aka glibc) and set C.UTF-8 locale as default.
+
+ENV ALPINE_GLIBC_BASE_URL="https://github.com/armhf-docker-library/alpine-pkg-glibc/releases"
+ENV ALPINE_GLIBC_PACKAGE_VERSION="2.22"
+ENV ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
+ENV ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
+ENV ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk"
+RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates
+
+RUN wget "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME"  \
+         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
+RUN apk add --allow-untrusted --no-cache \
+        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
+
+RUN /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 "$LANG" || true
+RUN echo "export LANG=$LANG" > /etc/profile.d/locale.sh
+RUN apk del glibc-i18n
+RUN rm "/root/.wget-hsts"
+RUN apk del .build-dependencies
+RUN rm \
+        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 
 ENV JAVA_VERSION=8 \
     JAVA_UPDATE=192 \ 
