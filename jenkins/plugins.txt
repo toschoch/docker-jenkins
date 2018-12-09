@@ -1,4 +1,5 @@
 credentials-binding
+folders
 matrix-auth
 git
 swarm
