@@ -34,11 +34,6 @@ EXPOSE ${agent_port}
 
 ENV JENKINS_URL=https://updates.jenkins-ci.org/download/war/${JENKINS_VERSION}/jenkins.war
 
-COPY jenkins-support /usr/local/bin/jenkins-support
-COPY jenkins.sh /usr/local/bin/jenkins.sh
-COPY install-plugins.sh /usr/local/bin/install-plugins.sh
-COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
-
 RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils docker && \
     addgroup -g ${gid} ${group} && \
     adduser -h "$JENKINS_HOME" -u ${uid} -G ${group} -s /bin/bash -D ${user} && \
@@ -46,8 +41,14 @@ RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils d
     echo "$TINI_SHA  /bin/tini" | sha256sum -c - && \
     curl -fsSL ${JENKINS_URL} -o /usr/share/jenkins/jenkins.war && \ 
     echo "${JENKINS_SHA}  /usr/share/jenkins/jenkins.war" | sha256sum -c - && \
-    chown -R ${uid} "$JENKINS_HOME" /usr/share/jenkins/ref && \
-    /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
+    chown -R ${uid} "$JENKINS_HOME" /usr/share/jenkins/ref
+
+COPY jenkins-support /usr/local/bin/jenkins-support
+COPY jenkins.sh /usr/local/bin/jenkins.sh
+COPY install-plugins.sh /usr/local/bin/install-plugins.sh
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+
+RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
 VOLUME $JENKINS_HOME
 

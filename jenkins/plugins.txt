@@ -1,4 +1,5 @@
 credentials-binding
+blueocean
 matrix-auth
 git
 swarm
