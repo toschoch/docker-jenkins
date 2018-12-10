@@ -19,6 +19,8 @@ ENV JENKINS_HOME=/var/jenkins_home \
     JENKINS_USER=jenkins-user \
     JENKINS_PASS=jenkins-pass
 
+VOLUME $JENKINS_HOME
+
 # Jenkins home directory is a volume, so configuration and build history 
 # can be persisted and survive image upgrades
 RUN  mkdir -p /usr/share/jenkins/ref/init.groovy.d
@@ -47,7 +49,7 @@ RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils d
     curl -fsSL ${JENKINS_URL} -o /usr/share/jenkins/jenkins.war && \ 
     echo "${JENKINS_SHA}  /usr/share/jenkins/jenkins.war" | sha256sum -c -
 
-RUN chown -R ${uid} /var/jenkins_home /usr/share/jenkins/ref
+RUN chown -R ${uid} "$JENKINS_HOME" /usr/share/jenkins/ref
 
 ENV COPY_REFERENCE_FILE_LOG=$JENKINS_HOME/copy_reference_file.log
 
