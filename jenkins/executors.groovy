@@ -1,10 +1,11 @@
 import jenkins.model.*
+import hudson
 import hudson.model.*
 
-Jenkins.instance.setNumExecutors(5)
+Jenkins.instance.setNumExecutors(2)
 
-hudson = Hudson.instance
-hudson.slaves.findAll { it.nodeName.equals("slave4") }.each { slave -> 
+hudson = hudson.model.Hudson.instance
+hudson.slaves.each { slave -> 
   print "Slave  $slave.nodeName : Labels: $slave.labelString"
   slave.labelString = slave.labelString + " " + "docker"
   println "   --> New labels: $slave.labelString"
