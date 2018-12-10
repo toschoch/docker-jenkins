@@ -26,10 +26,6 @@ RUN  mkdir -p /usr/share/jenkins/ref/init.groovy.d
 
 COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groovy
 COPY default-user.groovy /usr/share/jenkins/ref/init.groovy.d/default-user.groovy
-COPY jenkins-support /usr/local/bin/jenkins-support
-COPY jenkins.sh /usr/local/bin/jenkins.sh
-COPY install-plugins.sh /usr/local/bin/install-plugins.sh
-COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 
 # for main web interface:
 EXPOSE ${http_port}
@@ -52,6 +48,11 @@ RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils &
     /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
 USER ${user}
+
+COPY jenkins-support /usr/local/bin/jenkins-support
+COPY jenkins.sh /usr/local/bin/jenkins.sh
+COPY install-plugins.sh /usr/local/bin/install-plugins.sh
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 
 ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
 
