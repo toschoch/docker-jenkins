@@ -33,16 +33,12 @@ EXPOSE ${http_port}
 # will be used by attached slave agents:
 EXPOSE ${agent_port}
 
-USER ${user}
-
 ENV JENKINS_URL=https://updates.jenkins-ci.org/download/war/${JENKINS_VERSION}/jenkins.war
 
 COPY jenkins-support /usr/local/bin/jenkins-support
 COPY jenkins.sh /usr/local/bin/jenkins.sh
 COPY install-plugins.sh /usr/local/bin/install-plugins.sh
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
-
-USER root
 
 RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils docker && \
     addgroup -g ${gid} ${group} && \
