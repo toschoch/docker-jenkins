@@ -1,5 +1,4 @@
 import jenkins.model.*
-import hudson
 import hudson.model.*
 
 Jenkins.instance.setNumExecutors(2)
