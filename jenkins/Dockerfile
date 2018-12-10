@@ -1,7 +1,5 @@
 FROM shocki/docker-alpine-oracle-jdk-arm
 
-RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils
-
 ARG user=jenkins
 ARG group=jenkins
 ARG uid=1000
@@ -16,7 +14,6 @@ ENV JENKINS_HOME=/var/jenkins_home \
     TINI_SHA=efc2933bac3290aae1180a708f58035baf9f779833c2ea98fcce0ecdab68aa61 \
     JENKINS_VERSION=2.154 \
     JENKINS_SHA=2d12418c2e482eaf2cf1d13ad2b25f58e801b80c46cbd6dd3bae4c6df308d98e \
-    JENKINS_URL=https://updates.jenkins-ci.org/download/war/${JENKINS_VERSION}/jenkins.war \
     SECRETS_DIR=/run/secrets \
     JAVA_OPTS="-Djenkins.install.runSetupWizard=false" \
     JENKINS_USER=jenkins-user \
@@ -40,9 +37,11 @@ EXPOSE ${http_port}
 # will be used by attached slave agents:
 EXPOSE ${agent_port}
 
-ENV COPY_REFERENCE_FILE_LOG $JENKINS_HOME/copy_reference_file.log
+ENV COPY_REFERENCE_FILE_LOG=$JENKINS_HOME/copy_reference_file.log \
+    JENKINS_URL=https://updates.jenkins-ci.org/download/war/${JENKINS_VERSION}/jenkins.war
 
-RUN addgroup -g ${gid} ${group} && \
+RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils && \
+    addgroup -g ${gid} ${group} && \
     adduser -h "$JENKINS_HOME" -u ${uid} -G ${group} -s /bin/bash -D ${user} && \
     curl -fsSL https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static-armhf -o /bin/tini && chmod +x /bin/tini && \
     echo "$TINI_SHA  /bin/tini" | sha256sum -c - && \
