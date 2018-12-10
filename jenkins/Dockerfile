@@ -35,8 +35,7 @@ EXPOSE ${agent_port}
 
 USER ${user}
 
-ENV COPY_REFERENCE_FILE_LOG=$JENKINS_HOME/copy_reference_file.log \
-    JENKINS_URL=https://updates.jenkins-ci.org/download/war/${JENKINS_VERSION}/jenkins.war
+ENV JENKINS_URL=https://updates.jenkins-ci.org/download/war/${JENKINS_VERSION}/jenkins.war
 
 COPY jenkins-support /usr/local/bin/jenkins-support
 COPY jenkins.sh /usr/local/bin/jenkins.sh
@@ -55,8 +54,7 @@ RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils d
     chown -R ${user} "$JENKINS_HOME" /usr/share/jenkins/ref && \
     /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
-
-RUN chown -R ${user} "$JENKINS_HOME" /usr/share/jenkins/ref && chmod -R 777 "$JENKINS_HOME" /usr/share/jenkins/ref
+ENV COPY_REFERENCE_FILE_LOG=$JENKINS_HOME/copy_reference_file.log
 
 USER ${user}
 
