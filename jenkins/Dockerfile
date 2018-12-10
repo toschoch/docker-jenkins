@@ -19,8 +19,6 @@ ENV JENKINS_HOME=/var/jenkins_home \
     JENKINS_USER=jenkins-user \
     JENKINS_PASS=jenkins-pass
 
-VOLUME $JENKINS_HOME
-
 # Jenkins home directory is a volume, so configuration and build history 
 # can be persisted and survive image upgrades
 RUN  mkdir -p /usr/share/jenkins/ref/init.groovy.d
@@ -47,15 +45,15 @@ RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils d
     curl -fsSL https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static-armhf -o /bin/tini && chmod +x /bin/tini && \
     echo "$TINI_SHA  /bin/tini" | sha256sum -c - && \
     curl -fsSL ${JENKINS_URL} -o /usr/share/jenkins/jenkins.war && \ 
-    echo "${JENKINS_SHA}  /usr/share/jenkins/jenkins.war" | sha256sum -c -
+    echo "${JENKINS_SHA}  /usr/share/jenkins/jenkins.war" | sha256sum -c - && \
+    chown -R ${uid} "$JENKINS_HOME" /usr/share/jenkins/ref && \
+    /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
-RUN chown -R ${uid} "$JENKINS_HOME" /usr/share/jenkins/ref
+VOLUME $JENKINS_HOME
 
 ENV COPY_REFERENCE_FILE_LOG=$JENKINS_HOME/copy_reference_file.log
 
 USER ${user}
-
-RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
 ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
 
