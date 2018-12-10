@@ -12,8 +12,8 @@ ENV JENKINS_HOME=/var/jenkins_home \
     JENKINS_UC=https://updates.jenkins.io \
     TINI_VERSION=0.18.0 \
     TINI_SHA=efc2933bac3290aae1180a708f58035baf9f779833c2ea98fcce0ecdab68aa61 \
-    JENKINS_VERSION=2.154 \
-    JENKINS_SHA=2d12418c2e482eaf2cf1d13ad2b25f58e801b80c46cbd6dd3bae4c6df308d98e \
+    JENKINS_VERSION=2.150.1 \
+    JENKINS_SHA=7a38586d5a3a1a83498809a83715728bb2f01b58a7dd3a88366f076efdaf6669 \
     SECRETS_DIR=/run/secrets \
     JAVA_OPTS="-Djenkins.install.runSetupWizard=false" \
     JENKINS_USER=jenkins-user \
@@ -25,6 +25,7 @@ RUN  mkdir -p /usr/share/jenkins/ref/init.groovy.d
 
 COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groovy
 COPY default-user.groovy /usr/share/jenkins/ref/init.groovy.d/default-user.groovy
+COPY executors.groovy /usr/share/jenkins/ref/init.groovy.d/executors.groovy
 
 # for main web interface:
 EXPOSE ${http_port}
@@ -32,7 +33,7 @@ EXPOSE ${http_port}
 # will be used by attached slave agents:
 EXPOSE ${agent_port}
 
-ENV JENKINS_URL=https://updates.jenkins-ci.org/download/war/${JENKINS_VERSION}/jenkins.war
+ENV JENKINS_URL=http://mirrors.jenkins.io/war-stable/${JENKINS_VERSION}/jenkins.war
 
 RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils docker && \
     addgroup -g ${gid} ${group} && \
@@ -41,7 +42,8 @@ RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils d
     echo "$TINI_SHA  /bin/tini" | sha256sum -c - && \
     curl -fsSL ${JENKINS_URL} -o /usr/share/jenkins/jenkins.war && \ 
     echo "${JENKINS_SHA}  /usr/share/jenkins/jenkins.war" | sha256sum -c - && \
-    chown -R ${uid} "$JENKINS_HOME" /usr/share/jenkins/ref
+    chown -R ${uid} "$JENKINS_HOME" /usr/share/jenkins/ref && \
+    adduser ${user} docker 
 
 COPY jenkins-support /usr/local/bin/jenkins-support
 COPY jenkins.sh /usr/local/bin/jenkins.sh
