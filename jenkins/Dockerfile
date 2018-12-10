@@ -36,16 +36,14 @@ EXPOSE ${agent_port}
 ENV COPY_REFERENCE_FILE_LOG=$JENKINS_HOME/copy_reference_file.log \
     JENKINS_URL=https://updates.jenkins-ci.org/download/war/${JENKINS_VERSION}/jenkins.war
 
-RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils && \
+RUN apk add --no-cache git openssh-client curl unzip bash ttf-dejavu coreutils docker && \
     addgroup -g ${gid} ${group} && \
     adduser -h "$JENKINS_HOME" -u ${uid} -G ${group} -s /bin/bash -D ${user} && \
     curl -fsSL https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static-armhf -o /bin/tini && chmod +x /bin/tini && \
     echo "$TINI_SHA  /bin/tini" | sha256sum -c - && \
     curl -fsSL ${JENKINS_URL} -o /usr/share/jenkins/jenkins.war && \ 
     echo "${JENKINS_SHA}  /usr/share/jenkins/jenkins.war" | sha256sum -c - && \ 
-    chown -R ${user} "$JENKINS_HOME" /usr/share/jenkins/ref && \
-    apk add --no-cache docker git && \
-    /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
+    chown -R ${user} "$JENKINS_HOME" /usr/share/jenkins/ref
 
 USER ${user}
 
@@ -53,6 +51,8 @@ COPY jenkins-support /usr/local/bin/jenkins-support
 COPY jenkins.sh /usr/local/bin/jenkins.sh
 COPY install-plugins.sh /usr/local/bin/install-plugins.sh
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+
+RUN  /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
 ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
 
