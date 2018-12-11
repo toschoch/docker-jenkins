@@ -14,9 +14,9 @@ services:
       - jenkins-pass
 
   agents:
-    image: shocki/jenkins-agent:amd64
+    image: shocki/jenkins-agent
     environment:
-      - COMMAND_OPTIONS=-master http://master:8080 -labels docker -executors 4
+      - COMMAND_OPTIONS=-master http://master:8080 -labels docker -executors 2
     hostname: "{{.Node.Hostname}}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

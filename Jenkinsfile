@@ -1,5 +1,6 @@
 def axisNode = ["Linux(arm)","Linux(x64)"]
 def imageTags = ["arm32v6","amd64"]
+def manifestAnnotations = [["variant":"armv7l"],[:]]
 def imageNames = []
 def tasks = [:]
 
@@ -49,11 +50,23 @@ stage("Push Manifest") {
             imageTag = "${USERNAME}/${imageTag}"
         }
 
+        println "create manifest..."
         def tagList = ""
         for(int i=0; i< imageNames.size(); i++) {
             tagList = "${tagList} ${imageNames[i]}"
-
+        }
         sh "docker manifest create ${imageTag} ${tagList}"
+
+        println "annotate images..."
+        for(int i=0; i< imageNames.size(); i++) {
+            def cmd = "docker manifest annotate "
+            for (e in manifestAnnotations[i]) {
+                cmd = cmd + "--" + e.key + " " + e.value
+            }
+            cmd = cmd + " " + imageNames[i]
+            sh cmd
+        }
+
         sh "docker manifest push ${imageTag}"
     }
 }
