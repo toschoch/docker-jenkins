@@ -1,50 +1,31 @@
 version: '3.1'
+
 services:
 
-    master:
-        image: shocki/jenkins
+  master:
+    image: shocki/jenkins
+    environment:
+      - JENKINS_URL=http://localhost:8080
+    ports:
+      - ${UI_PORT:-8080}:8080
+      - ${AGENTS_PORT:-50000}:50000
+    secrets:
+      - jenkins-user
+      - jenkins-pass
 
-        ports:
-            - '8080:8080'
-            - '50000:50000'
-
-        environment:      
-            - JENKINS_URL=http://localhost:8080
-        
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock  # Expose the docker daemon in the container
-
-        secrets:
-            - jenkins-user
-            - jenkins-pass
-
-        deploy:
-            replicas: 1
-            placement: 
-                constraints:
-                    - node.labels.device.type!=rpi
-
-    agents:
-        image: shocki/jenkins-agent
-
-        environment:
-            - COMMAND_OPTIONS=-master http://10.0.0.145:8080 -labels 'docker' -executors 4
-        hostname: "{{.Node.Hostname}}"
-
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
-
-        secrets:
-            - jenkins-user
-            - source: jenkins-pass
-              mode: 0400
-
-        deploy:
-            mode: global
-            placement: 
-                constraints:
-                    - node.labels.device.group==build-pi
-
+  agents:
+    image: shocki/jenkins-agent:amd64
+    environment:
+      - COMMAND_OPTIONS=-master http://master:8080 -labels docker -executors 4
+    hostname: "{{.Node.Hostname}}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    secrets:
+      - jenkins-user
+      - source: jenkins-pass
+        mode: 0400
+    deploy:
+      mode: global
 
 secrets:
   jenkins-user:
