@@ -41,7 +41,7 @@ for(int i=0; i< axisNode.size(); i++) {
 }
 
 stage ("Build") {
-    parllel tasks
+    tasks
 }
 
 stage("Push Manifest") {
