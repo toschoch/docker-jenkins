@@ -9,15 +9,8 @@ services:
       - ${JENKINS_PATH}:/var/jenkins_home
     environment:
       - JENKINS_URL=${JENKINS_URL:-http://localhost:8080}
+      - JENKINS_USER=${JENKINS_USER}
+      - JENKINS_PASS=${JENKINS_PASS}
     ports:
       - ${UI_PORT:-8080}:8080
       - ${AGENTS_PORT:-50000}:50000
-    secrets:
-      - jenkins-user
-      - jenkins-pass
-
-secrets:
-  jenkins-user:
-    external: true
-  jenkins-pass:
-    external: true
