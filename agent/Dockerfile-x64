@@ -1,0 +1,18 @@
+FROM frolvlad/alpine-oraclejdk8
+
+ENV SWARM_CLIENT_VERSION="3.14" \
+    DOCKER_COMPOSE_VERSION="1.23.1" \
+    COMMAND_OPTIONS="" 
+
+RUN adduser -G root -D jenkins -h /home/jenkins && \
+    apk --update --no-cache add git docker python py-pip && \
+    wget -q https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/swarm-client-${SWARM_CLIENT_VERSION}.jar -P /home/jenkins/ && \
+    pip install docker-compose
+
+ENV JENKINS_USER="jenkins-user" JENKINS_PASS="jenkins-pass"
+
+COPY run.sh /run.sh
+RUN mkdir /workspace && chmod 777 /workspace && chmod +x /run.sh
+
+CMD ["/run.sh"]
+
