@@ -4,7 +4,7 @@ services:
 
   jenkins:
     image: shocki/jenkins
-    name: jenkins
+    container_name: jenkins
     volumes:
       - ${JENKINS_PATH}:/var/jenkins_home
     environment:
