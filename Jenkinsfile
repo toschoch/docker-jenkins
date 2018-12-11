@@ -1,4 +1,4 @@
-def axisNode = ["Linux(arm)","Linux(x64)"]
+def axisNode = ["Linux (arm)","Linux (x64)"]
 def imageTags = ["arm32v6","amd64"]
 def manifestAnnotations = [["variant":"armv7l"],[:]]
 def imageNames = []
@@ -6,10 +6,12 @@ def tasks = [:]
 
 stage("Checkout") {
     node {
-        echo "before"
+        echo "checkout..."
         checkout scm
         env.VERSION = gitVersion()
+        echo "Version = ${env.VERSION}"
         env.ISTAG = isTag()
+        echo "Tag = ${env.ISTAG}"
     }
 }
 
@@ -39,7 +41,7 @@ for(int i=0; i< axisNode.size(); i++) {
 }
 
 stage ("Build") {
-    parallel tasks
+    parllel tasks
 }
 
 stage("Push Manifest") {
